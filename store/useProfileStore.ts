@@ -123,7 +123,15 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     const next: Profile = { ...prev, favoriteStations: Array.from(setFavs) };
     set({ profile: next });
     try {
-      await get().saveProfile({ favoriteStations: next.favoriteStations });
+      const authHeader = useAuthStore.getState().getAuthHeader?.() ?? {};
+      const res = await fetch(`${BASE_URL}/v1/profile`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json", ...authHeader },
+        body: JSON.stringify({
+          favoriteStations: setFavs,
+        }),
+      });
     } catch (err: unknown) {
       console.error("useProfileStore.toggleFavoriteStation error", err);
       set({ profile: prev });
