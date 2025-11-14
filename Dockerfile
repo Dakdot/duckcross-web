@@ -1,6 +1,6 @@
 ARG NEXT_PUBLIC_BUILD_TIME
 
-FROM node:22-alpine AS base
+FROM node:24-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -23,7 +23,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN npx prisma generate
 RUN npm run build
 
 # Production image, copy all the files and run the server
