@@ -1,7 +1,14 @@
 import { create } from "zustand";
 
+export type Station = {
+  id: string;
+  name: string;
+  status: "OK" | "WARN" | "DELAY";
+  message: string;
+};
+
 type DataState = {
-  data: string;
+  data: Station[];
   fetched: number; // ms since epoch when data was last updated
   fetchData: () => Promise<void>;
   startAutoRefresh: () => void;
@@ -14,20 +21,21 @@ const BASE_URL = "https://api.duckcross.com";
 let intervalId: number | null = null;
 
 export const useDataStore = create<DataState>((set, get) => ({
-  data: "",
+  data: [],
   fetched: 0,
 
-  // fetch data from /v1/data and store as string
+  // fetch data from /v1/data and store as typed Station[]
   fetchData: async () => {
     try {
       const res = await fetch(`${BASE_URL}/v1/data`);
       if (!res.ok) {
-        // keep previous data on error but record timestamp? we choose not to update timestamp
+        // keep previous data on error and don't update timestamp
         console.error("useDataStore: failed to fetch /v1/data", res.status);
         return;
       }
       const json = await res.json();
-      const payload = typeof json === "string" ? json : JSON.stringify(json);
+      // Expecting an array of station objects. Be defensive: only set when we get an array.
+      const payload: Station[] = Array.isArray(json) ? (json as Station[]) : [];
       set({ data: payload, fetched: Date.now() });
     } catch (err) {
       console.error("useDataStore: fetch error", err);
