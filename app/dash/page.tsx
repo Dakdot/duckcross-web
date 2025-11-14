@@ -19,7 +19,9 @@ export default function DashPage() {
     <div className="flex flex-col gap-4 p-8">
       <p>Auth Store: {JSON.stringify(authStore)}</p>
 
-      <p>Profile Store: {JSON.stringify(profileStore)}</p>
+      <p>
+        Profile Store: {JSON.stringify(profileStore.profile?.favoriteStations)}
+      </p>
 
       <p>My Favorites</p>
 
