@@ -51,6 +51,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     console.log("Logged in!", accessToken);
 
     set({ accessToken, id, authenticated: !!accessToken });
+
+    if (get().authenticated) {
+      const { loadProfile } = useProfileStore.getState();
+      if (typeof loadProfile === "function") {
+        await loadProfile();
+      }
+    }
   },
 
   logout: async () => {
