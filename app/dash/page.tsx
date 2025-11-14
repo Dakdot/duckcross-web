@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 export default function DashPage() {
   const [data, setData] = useState<Station[]>([]);
   const [profile, setProfile] = useState<Profile>();
+  const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   const authStore = useAuthStore();
@@ -29,17 +30,21 @@ export default function DashPage() {
   useEffect(() => {
     const getData = async () => {
       try {
+        setIsLoading(true);
         const res = await fetch("https://api.duckcross.com/v1/data");
         if (!res.ok) throw new Error("failed to fetch");
         const json = await res.json();
         setData(json as Station[]);
       } catch (err) {
         console.error(err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     const getProfile = async () => {
       try {
+        setIsProfileLoading(true);
         if (!authStore.authenticated) return;
         const authHeader = authStore.getAuthHeader();
         const res = await fetch("https://api.duckcross.com/v1/profile", {
@@ -54,6 +59,8 @@ export default function DashPage() {
         setProfile(data as Profile);
       } catch (err) {
         console.error(err);
+      } finally {
+        setIsProfileLoading(false);
       }
     };
 
@@ -153,7 +160,7 @@ export default function DashPage() {
                   <TooltipTrigger asChild>
                     <Button
                       variant={"outline"}
-                      disabled={isLoading}
+                      disabled={isProfileLoading}
                       onClick={() => toggleFavoriteStation(e.id)}
                     >
                       <Minus />
@@ -193,7 +200,7 @@ export default function DashPage() {
                   <TooltipTrigger asChild>
                     <Button
                       variant={"outline"}
-                      disabled={isLoading}
+                      disabled={isProfileLoading}
                       onClick={() => toggleFavoriteStation(e.id)}
                     >
                       <Plus />
