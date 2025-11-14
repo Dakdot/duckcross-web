@@ -73,11 +73,11 @@ export default function DashPage() {
   }, [setData]);
 
   useEffect(() => {
-    console.log(profile);
+    console.log("profile:", JSON.stringify(profile));
   }, [profile]);
 
   useEffect(() => {
-    console.log(JSON.stringify(data));
+    console.log("data:", JSON.stringify(data));
   }, [data]);
 
   const toggleFavoriteStation = async (stationId: string) => {
