@@ -39,8 +39,6 @@ export default function DashPage() {
 
       <p>My Favorites</p>
 
-      <p>Other Stations</p>
-
       <div className="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
         {[...dataStore.data]
           .sort((a, b) => {
@@ -50,6 +48,10 @@ export default function DashPage() {
               OK: 2,
             };
             return order[a.status] - order[b.status];
+          })
+          .filter((e) => {
+            const favs = profileStore.profile?.favoriteStations ?? [];
+            return favs.includes(e.id);
           })
           .map((e) => (
             <Card key={e.id}>
@@ -69,7 +71,62 @@ export default function DashPage() {
                 <CardAction>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Button variant={"outline"}>
+                      <Button
+                        variant={"outline"}
+                        onClick={() => profileStore.toggleFavoriteStation(e.id)}
+                      >
+                        <Plus />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Add to favorites</TooltipContent>
+                  </Tooltip>
+                </CardAction>
+              </CardHeader>
+              <CardContent>
+                <p>{e.message}</p>
+              </CardContent>
+            </Card>
+          ))}
+      </div>
+
+      <p>Other Stations</p>
+
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+        {[...dataStore.data]
+          .sort((a, b) => {
+            const order: Record<Station["status"], number> = {
+              DELAY: 0,
+              WARN: 1,
+              OK: 2,
+            };
+            return order[a.status] - order[b.status];
+          })
+          .filter((e) => {
+            const favs = profileStore.profile?.favoriteStations ?? [];
+            return !favs.includes(e.id);
+          })
+          .map((e) => (
+            <Card key={e.id}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <div
+                    className={`w-4 h-4 rounded-full ${
+                      e.status === "OK"
+                        ? "bg-green-500"
+                        : e.status === "WARN"
+                        ? "bg-amber-400"
+                        : "bg-red-500"
+                    }`}
+                  />
+                  {e.name}
+                </CardTitle>
+                <CardAction>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        onClick={() => profileStore.toggleFavoriteStation(e.id)}
+                      >
                         <Plus />
                       </Button>
                     </TooltipTrigger>
