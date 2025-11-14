@@ -145,26 +145,40 @@ export default function DashPage() {
 
   return (
     <div className="flex flex-col gap-4 p-8">
+      <div className="flex items-center gap-4">
+        <img src={"/icon.png"} width={50} />
+        <div>
+          <p className="text-lg font-bold">FlapBoard</p>
+          <p className="text-sm text-black/50">A derivative of DuckCross</p>
+        </div>
+      </div>
+
       <h1 className="text-2xl">Welcome!</h1>
 
       <p>My Favorites</p>
+
+      {favorites.length < 1 && (
+        <p className="text-sm italic text-zinc-700">No favorites to show.</p>
+      )}
 
       <div className="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
         {favorites.map((e) => (
           <Card key={e.id}>
             <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <div
-                  className={`w-4 h-4 rounded-full ${
-                    e.status === "OK"
-                      ? "bg-green-500"
-                      : e.status === "WARN"
-                      ? "bg-amber-400"
-                      : "bg-red-500"
-                  }`}
-                />
-                {e.name}
-              </CardTitle>
+              <div className="flex flex-col">
+                <div className="flex gap-2 items-center font-medium">
+                  <div
+                    className={`w-4 h-4 rounded-full ${
+                      e.status === "OK"
+                        ? "bg-green-500"
+                        : e.status === "WARN"
+                        ? "bg-amber-400"
+                        : "bg-red-500"
+                    }`}
+                  />
+                  {e.name}
+                </div>
+              </div>
               <CardAction>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -193,18 +207,21 @@ export default function DashPage() {
         {others.map((e) => (
           <Card key={e.id}>
             <CardHeader>
-              <CardTitle className="flex items-center gap-3">
-                <div
-                  className={`w-4 h-4 rounded-full ${
-                    e.status === "OK"
-                      ? "bg-green-500"
-                      : e.status === "WARN"
-                      ? "bg-amber-400"
-                      : "bg-red-500"
-                  }`}
-                />
-                {e.name}
-              </CardTitle>
+              <div className="flex flex-col">
+                <div className="flex gap-2 items-center font-medium">
+                  <div
+                    className={`w-4 h-4 rounded-full ${
+                      e.status === "OK"
+                        ? "bg-green-500"
+                        : e.status === "WARN"
+                        ? "bg-amber-400"
+                        : "bg-red-500"
+                    }`}
+                  />
+                  {e.name}
+                </div>
+              </div>
+              <CardTitle className="flex items-center gap-3"></CardTitle>
               <CardAction>
                 <Tooltip>
                   <TooltipTrigger asChild>

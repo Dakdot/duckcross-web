@@ -51,13 +51,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     console.log("Logged in!", accessToken);
 
     set({ accessToken, id, authenticated: !!accessToken });
-
-    if (get().authenticated) {
-      const { loadProfile } = useProfileStore.getState();
-      if (typeof loadProfile === "function") {
-        await loadProfile();
-      }
-    }
   },
 
   logout: async () => {
@@ -131,12 +124,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ accessToken: token, id, authenticated: true });
       // try to refresh to validate token and obtain a fresh one
       await get().refresh();
-      if (get().authenticated) {
-        const { loadProfile } = useProfileStore.getState();
-        if (typeof loadProfile === "function") {
-          await loadProfile();
-        }
-      }
     } else {
       set({ accessToken: null, id: undefined, authenticated: false });
     }

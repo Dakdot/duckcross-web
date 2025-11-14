@@ -5,6 +5,11 @@ export type Station = {
   name: string;
   status: "OK" | "WARN" | "DELAY";
   message: string;
+  lines: {
+    id: string;
+    color: string;
+    name: string;
+  };
 };
 
 type DataState = {
