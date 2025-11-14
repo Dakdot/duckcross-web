@@ -72,9 +72,18 @@ export default function DashPage() {
     return clearInterval(interval);
   }, [setData]);
 
+  useEffect(() => {
+    console.log(profile);
+  }, [profile]);
+
+  useEffect(() => {
+    console.log(JSON.stringify(data));
+  }, [data]);
+
   const toggleFavoriteStation = async (stationId: string) => {
+    console.log(JSON.stringify(profile));
     try {
-      setIsLoading(true);
+      setIsProfileLoading(true);
 
       if (!profile) return;
       const setFavs = new Set(profile.favoriteStations || []);
@@ -100,8 +109,9 @@ export default function DashPage() {
         console.error("useProfileStore.toggleFavoriteStation error", err);
       }
     } catch (err) {
+      console.error(err);
     } finally {
-      setIsLoading(false);
+      setIsProfileLoading(false);
     }
   };
 
