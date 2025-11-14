@@ -1,9 +1,22 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Station, useDataStore } from "@/store/useDataStore";
 import useProfileStore from "@/store/useProfileStore";
+import { Plus } from "lucide-react";
 import { useEffect } from "react";
 
 export default function DashPage() {
@@ -13,6 +26,7 @@ export default function DashPage() {
 
   useEffect(() => {
     dataStore.fetchData();
+    dataStore.startAutoRefresh();
   }, []);
 
   return (
@@ -40,7 +54,7 @@ export default function DashPage() {
           .map((e) => (
             <Card key={e.id}>
               <CardHeader>
-                <CardTitle className="flex gap-3">
+                <CardTitle className="flex items-center gap-3">
                   <div
                     className={`w-4 h-4 rounded-full ${
                       e.status === "OK"
@@ -52,6 +66,16 @@ export default function DashPage() {
                   />
                   {e.name}
                 </CardTitle>
+                <CardAction>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant={"outline"}>
+                        <Plus />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Add to favorites</TooltipContent>
+                  </Tooltip>
+                </CardAction>
               </CardHeader>
               <CardContent>
                 <p>{e.message}</p>

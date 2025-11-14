@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import useProfileStore from "./useProfileStore";
 
 type AuthState = {
   id?: number;
@@ -123,6 +124,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ accessToken: token, id, authenticated: true });
       // try to refresh to validate token and obtain a fresh one
       await get().refresh();
+      if (get().authenticated) {
+        const { loadProfile } = useProfileStore.getState();
+        if (typeof loadProfile === "function") {
+          await loadProfile();
+        }
+      }
     } else {
       set({ accessToken: null, id: undefined, authenticated: false });
     }
