@@ -124,7 +124,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     set({ profile: next });
     try {
       const authHeader = useAuthStore.getState().getAuthHeader?.() ?? {};
-      const res = await fetch(`${BASE_URL}/v1/profile`, {
+      await fetch(`${BASE_URL}/v1/profile`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json", ...authHeader },

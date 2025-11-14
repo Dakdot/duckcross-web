@@ -15,24 +15,90 @@ import {
 } from "@/components/ui/tooltip";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Station, useDataStore } from "@/store/useDataStore";
-import useProfileStore from "@/store/useProfileStore";
+import useProfileStore, { Profile } from "@/store/useProfileStore";
 import { Minus, Plus } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function DashPage() {
-  const profileStore = useProfileStore();
-  const dataStore = useDataStore();
+  const [data, setData] = useState<Station[]>([]);
+  const [profile, setProfile] = useState<Profile>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const authStore = useAuthStore();
 
   useEffect(() => {
-    dataStore.fetchData();
-    dataStore.startAutoRefresh();
-  }, []);
+    const getData = async () => {
+      try {
+        const res = await fetch("https://api.duckcross.com/v1/data");
+        if (!res.ok) throw new Error("failed to fetch");
+        const json = await res.json();
+        setData(json as Station[]);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-  useEffect(() => {
-    console.log(JSON.stringify(profileStore.profile));
-  }, [profileStore.profile]);
+    const getProfile = async () => {
+      try {
+        if (!authStore.authenticated) return;
+        const authHeader = authStore.getAuthHeader();
+        const res = await fetch("https://api.duckcross.com/v1/profile", {
+          credentials: "include",
+          headers: { "Content-Type": "application/json", ...authHeader },
+        });
 
-  const favorites = [...dataStore.data]
+        if (!res.ok) throw new Error("failed to get profile");
+
+        const data = await res.json();
+
+        setProfile(data as Profile);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    getData();
+    getProfile();
+
+    const interval = setInterval(getData, 60000);
+
+    return clearInterval(interval);
+  }, [setData]);
+
+  const toggleFavoriteStation = async (stationId: string) => {
+    try {
+      setIsLoading(true);
+
+      if (!profile) return;
+      const setFavs = new Set(profile.favoriteStations || []);
+      if (setFavs.has(stationId)) setFavs.delete(stationId);
+      else setFavs.add(stationId);
+
+      const next: Profile = {
+        ...profile,
+        favoriteStations: Array.from(setFavs),
+      };
+      setProfile(next);
+      try {
+        const authHeader = useAuthStore.getState().getAuthHeader?.() ?? {};
+        await fetch(`https://api.duckcross.com/v1/profile`, {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json", ...authHeader },
+          body: JSON.stringify({
+            favoriteStations: Array.from(setFavs),
+          }),
+        });
+      } catch (err: unknown) {
+        console.error("useProfileStore.toggleFavoriteStation error", err);
+      }
+    } catch (err) {
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const favorites = [...data]
     .sort((a, b) => {
       const order: Record<Station["status"], number> = {
         DELAY: 0,
@@ -42,11 +108,11 @@ export default function DashPage() {
       return order[a.status] - order[b.status];
     })
     .filter((e) => {
-      const favs = profileStore.profile?.favoriteStations ?? [];
+      const favs = profile?.favoriteStations ?? [];
       return favs.includes(e.id);
     });
 
-  const others = [...dataStore.data]
+  const others = [...data]
     .sort((a, b) => {
       const order: Record<Station["status"], number> = {
         DELAY: 0,
@@ -56,7 +122,7 @@ export default function DashPage() {
       return order[a.status] - order[b.status];
     })
     .filter((e) => {
-      const favs = profileStore.profile?.favoriteStations ?? [];
+      const favs = profile?.favoriteStations ?? [];
       return !favs.includes(e.id);
     });
 
@@ -87,8 +153,8 @@ export default function DashPage() {
                   <TooltipTrigger asChild>
                     <Button
                       variant={"outline"}
-                      disabled={profileStore.loading}
-                      onClick={() => profileStore.toggleFavoriteStation(e.id)}
+                      disabled={isLoading}
+                      onClick={() => toggleFavoriteStation(e.id)}
                     >
                       <Minus />
                     </Button>
@@ -127,8 +193,8 @@ export default function DashPage() {
                   <TooltipTrigger asChild>
                     <Button
                       variant={"outline"}
-                      disabled={profileStore.loading}
-                      onClick={() => profileStore.toggleFavoriteStation(e.id)}
+                      disabled={isLoading}
+                      onClick={() => toggleFavoriteStation(e.id)}
                     >
                       <Plus />
                     </Button>
