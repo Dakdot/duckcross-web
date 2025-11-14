@@ -129,7 +129,7 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
         credentials: "include",
         headers: { "Content-Type": "application/json", ...authHeader },
         body: JSON.stringify({
-          favoriteStations: setFavs,
+          favoriteStations: Array.from(setFavs),
         }),
       });
     } catch (err: unknown) {
