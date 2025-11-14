@@ -16,7 +16,7 @@ import {
 import { useAuthStore } from "@/store/useAuthStore";
 import { Station, useDataStore } from "@/store/useDataStore";
 import useProfileStore from "@/store/useProfileStore";
-import { Plus } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import { useEffect } from "react";
 
 export default function DashPage() {
@@ -73,12 +73,13 @@ export default function DashPage() {
                     <TooltipTrigger asChild>
                       <Button
                         variant={"outline"}
+                        disabled={profileStore.loading}
                         onClick={() => profileStore.toggleFavoriteStation(e.id)}
                       >
-                        <Plus />
+                        <Minus />
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>Add to favorites</TooltipContent>
+                    <TooltipContent>Remove from favorites</TooltipContent>
                   </Tooltip>
                 </CardAction>
               </CardHeader>
@@ -125,6 +126,7 @@ export default function DashPage() {
                     <TooltipTrigger asChild>
                       <Button
                         variant={"outline"}
+                        disabled={profileStore.loading}
                         onClick={() => profileStore.toggleFavoriteStation(e.id)}
                       >
                         <Plus />
