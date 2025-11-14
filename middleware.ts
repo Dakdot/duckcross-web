@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BASE_URL = "https://api.duckcross.com";
+// Allow overriding the API base URL via environment (useful for local dev)
+const BASE_URL = process.env.API_BASE_URL ?? "https://api.duckcross.com";
 
 /**
  * Middleware to protect certain routes and redirect unauthenticated users to `/`.
@@ -13,6 +14,19 @@ const BASE_URL = "https://api.duckcross.com";
  */
 export async function middleware(req: NextRequest) {
   const { nextUrl } = req;
+
+  // Development shortcut: when running the app on localhost, the browser
+  // won't include cookies for `api.duckcross.com` on requests to `localhost`.
+  // That causes the middleware refresh call (which relies on the cookie) to
+  // fail and redirect to `/`. To improve developer UX, bypass the middleware
+  // auth check for requests coming from localhost or 127.0.0.1.
+  //
+  // Important: this is strictly for local development. Production must rely
+  // on proper cookie domains and the refresh endpoint.
+  const hostname = req.nextUrl.hostname;
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    return NextResponse.next();
+  }
 
   // Forward cookie header to backend so the backend can check session cookies
   const cookie = req.headers.get("cookie") ?? "";
@@ -43,5 +57,8 @@ export async function middleware(req: NextRequest) {
 
 // Apply middleware to the dashboard (protected) routes. Adjust matcher as needed.
 export const config = {
-  matcher: ["/dash/:path*"],
+  // Match both the dashboard root and any nested dashboard routes.
+  // Some Next.js matcher edge-cases require the explicit root path to be
+  // included when protecting the top-level route.
+  matcher: ["/dash", "/dash/:path*"],
 };
