@@ -1,11 +1,13 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuthStore } from "@/store/useAuthStore";
 import { Station, useDataStore } from "@/store/useDataStore";
 import useProfileStore from "@/store/useProfileStore";
 import { useEffect } from "react";
 
 export default function DashPage() {
+  const authStore = useAuthStore();
   const profileStore = useProfileStore();
   const dataStore = useDataStore();
 
@@ -15,7 +17,9 @@ export default function DashPage() {
 
   return (
     <div className="flex flex-col gap-4 p-8">
-      <p>Profile ID: {profileStore.profile?.id}</p>
+      <p>Auth Store: {JSON.stringify(authStore)}</p>
+
+      <p>Profile Store: {JSON.stringify(profileStore)}</p>
 
       <p>My Favorites</p>
 
