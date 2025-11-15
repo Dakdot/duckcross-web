@@ -21,6 +21,7 @@ import { useEffect, useState } from "react";
 
 export default function DashPage() {
   const [data, setData] = useState<Station[]>([]);
+  const [fetched, setFetched] = useState<number | null>(null);
   const [profile, setProfile] = useState<Profile>();
   const [isProfileLoading, setIsProfileLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,6 +36,7 @@ export default function DashPage() {
         if (!res.ok) throw new Error("failed to fetch");
         const json = await res.json();
         setData(json as Station[]);
+        setFetched(Date.now());
       } catch (err) {
         console.error(err);
       } finally {
@@ -154,6 +156,15 @@ export default function DashPage() {
       </div>
 
       <h1 className="text-2xl">Welcome!</h1>
+
+      {isLoading && data.length < 1 && (
+        <p className="text-sm">Loading data...</p>
+      )}
+      {data && fetched && (
+        <p className="text-sm">
+          Last fetched {new Date(fetched).toLocaleTimeString()}
+        </p>
+      )}
 
       <p>My Favorites</p>
 
