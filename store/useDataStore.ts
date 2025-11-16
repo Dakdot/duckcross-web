@@ -9,7 +9,7 @@ export type Station = {
     id: string;
     color: string;
     name: string;
-  };
+  }[];
 };
 
 type DataState = {
