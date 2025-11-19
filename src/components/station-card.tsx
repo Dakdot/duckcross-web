@@ -20,7 +20,7 @@ export const StationCard = ({ station }: StationCardProps) => {
   ]);
 
   return (
-    <Card>
+    <Card className="dark:bg-white/10 dark:border-white/20 dark:text-white/85">
       <CardHeader>
         <div className="flex items-center gap-2">
           <Tooltip>

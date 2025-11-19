@@ -9,6 +9,7 @@ import type { Station } from "@/types";
 import { StationCard } from "@/components/station-card";
 import { Button } from "@/components/ui/button";
 import { ErrorCard } from "@/components/error-card";
+import { MdRefresh } from "react-icons/md";
 
 export const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -46,16 +47,18 @@ export const HomePage = () => {
   }, []);
 
   return (
-    <div className="space-y-4 p-4 sm:p-8">
+    <div className="dark:bg-stone-800 dark:text-white space-y-4 p-4 sm:p-8">
       <div className="flex gap-4 items-center">
         <img src={iconUrl} width={50} />
         <div>
           <p className="font-bold text-lg">FlapBoard</p>
-          <p className="text-sm text-neutral-500">A derivative of DuckCross</p>
+          <p className="text-sm text-black/60 dark:text-white/60">
+            A derivative of DuckCross
+          </p>
         </div>
         {lastFetchedAt && (
           <div className="flex flex-col gap-2 ml-auto">
-            <p className="text-sm text-neutral-700">
+            <p className="text-sm text-black/60 dark:text-white/60">
               Last fetched at {lastFetchedAt.toLocaleTimeString()}
             </p>
             <Button
@@ -63,7 +66,9 @@ export const HomePage = () => {
               size={"sm"}
               disabled={isLoading}
               onClick={getData}
+              className="dark:bg-white/15 dark:border-white/20"
             >
+              <MdRefresh />
               {isLoading ? "Fetching..." : "Fetch Now"}
             </Button>
           </div>

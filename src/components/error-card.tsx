@@ -21,7 +21,7 @@ export const ErrorCard = ({
   const Icon = severityIconMap[severity] ?? MdErrorOutline;
 
   return (
-    <div className="p-4 border rounded-xl shadow flex items-center gap-4 bg-red-100 text-red-900 border-red-500/20">
+    <div className="p-4 border rounded-xl shadow flex items-center gap-4 bg-red-100 text-red-900 border-red-500/20 dark:bg-red-900/50 dark:text-white/90">
       <Icon className="w-8 h-8" />
       <div>
         {title && <p className="font-medium">{title}</p>}
