@@ -2,16 +2,20 @@ import type { Station } from "@/types";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
+import RedUrl from "@/assets/red.png";
+import AmberUrl from "@/assets/amber.png";
+import GreenUrl from "@/assets/green.png";
+
 interface StationCardProps {
   station: Station;
 }
 
 export const StationCard = ({ station }: StationCardProps) => {
-  const colorMap = new Map([
-    ["OK", "bg-[radial-gradient(ellipse_at_50%_100%,_#bbffaa,_#338800)]"],
-    ["WARN", "bg-[radial-gradient(ellipse_at_50%_100%,_#ffff88,_#ee8800)]"],
-    ["DELAY", "bg-[radial-gradient(ellipse_at_50%_100%,_#ffaaaa,_#cc2200)]"],
-  ]);
+  const statusColorMap: Record<string, string> = {
+    OK: GreenUrl,
+    WARN: AmberUrl,
+    DELAY: RedUrl,
+  };
 
   const statusDescriptionMap = new Map([
     ["OK", "No delays indicated"],
@@ -25,9 +29,12 @@ export const StationCard = ({ station }: StationCardProps) => {
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <div
-                className={`w-4 h-4 relative aspect-square shadow-black/50 shadow rounded-full border border-black/20 ${colorMap.get(station.status)}`}
-              />
+              <div className="rounded-full overflow-hidden shadow">
+                <img
+                  src={statusColorMap[station.status]}
+                  className="w-4 h-4 aspect-square"
+                />
+              </div>
             </TooltipTrigger>
             <TooltipContent>
               {statusDescriptionMap.get(station.status)}
