@@ -1,49 +1,22 @@
-import axios from "axios";
-
 import iconUrl from "@/assets/icon.png";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { LineSpinner } from "ldrs/react";
 
-import type { Station } from "@/types";
 import { StationCard } from "@/components/station-card";
 import { Button } from "@/components/ui/button";
 import { ErrorCard } from "@/components/error-card";
 import { MdRefresh } from "react-icons/md";
+import { useDataStore } from "@/stores/useDataStore";
 
 export const HomePage = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<Station[]>([]);
-  const [lastFetchedAt, setLastFetchedAt] = useState<Date | null>(null);
-
-  const getData = async () => {
-    if (lastFetchedAt) {
-      if (Date.now() - lastFetchedAt.getTime() < 1000) {
-        setError(
-          "Too many requests. Please wait a few seconds before refreshing."
-        );
-        return;
-      }
-    }
-
-    try {
-      setIsLoading(true);
-      const res = await axios.get("/v1/data", {
-        baseURL: "https://api.duckcross.com",
-      });
-      setData(res.data as Station[]);
-      setLastFetchedAt(new Date());
-      setError(null);
-    } catch (err) {
-      setError(err as string);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { isLoading, error, data, lastFetchedAt, canFetch, getData } =
+    useDataStore();
 
   useEffect(() => {
     getData();
+    const handle = setInterval(() => getData(), 60 * 1000);
+    return clearInterval(handle);
   }, []);
 
   return (
@@ -64,7 +37,7 @@ export const HomePage = () => {
             <Button
               variant={"outline"}
               size={"sm"}
-              disabled={isLoading}
+              disabled={isLoading || !canFetch}
               onClick={getData}
               className="dark:bg-white/15 dark:border-white/20"
             >
@@ -87,7 +60,7 @@ export const HomePage = () => {
       {/* <h1>My Favorites</h1>
       <p className="italic text-sm text-neutral-500">No favorites to show.</p> */}
       <h1>All Stations</h1>
-      {isLoading && data.length < 1 && (
+      {isLoading && !data && (
         <div className=" flex items-center justify-center">
           <div className="flex flex-col items-center gap-4 p-4">
             <LineSpinner />
@@ -95,7 +68,7 @@ export const HomePage = () => {
           </div>
         </div>
       )}
-      {data.length > 0 && (
+      {data && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {data.map((e) => (
             <StationCard key={e.id} station={e} />
